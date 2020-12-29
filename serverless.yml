@@ -1,8 +1,19 @@
-service: parameter-store-replicator 
+service: parameter-store-replicator
+configValidationMode: error
 
 provider:
   name: aws
-  runtime: nodejs8.10
+  region: ${opt:region, 'us-east-1'}
+  runtime: nodejs10.x
+  versionFunctions: true
+  memorySize: 128
+  timeout: 120
+  logRetentionInDays: 7
+  stackName: parameter-store-replicator-${opt:stage, self:provider.stage}
+
+  deploymentBucket:
+    name: vela-devops-serverless
+
   iamRoleStatements:
     - Effect: "Allow"
       Action:
@@ -15,8 +26,12 @@ provider:
 
 functions:
   replicate:
-    environment: 
-      AWS_TARGET_REGION: ${opt:target}
+    package:
+      include:
+        - handler.js
+        - node_modules
+    environment:
+      AWS_TARGET_REGION: ${opt:target_region}
     handler: handler.replicate
     events:
       - cloudwatchEvent:
