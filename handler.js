@@ -33,8 +33,10 @@ const update = async (event) => {
 
   const targetParam = await checkTarget(event)
   if (!targetParam || targetParam.Parameter.Value !== sourceParam.Parameter.Value || targetParam.Parameter.Type !== sourceParam.Parameter.Type) {
-    // remove the version
+    // remove keys for validation
     delete sourceParam.Parameter.Version
+    delete sourceParam.Parameter.LastModifiedDate
+    delete sourceParam.Parameter.ARN
     // enable overwrites
     sourceParam.Parameter.Overwrite = true
     return targetSSM.putParameter(sourceParam.Parameter).promise()
